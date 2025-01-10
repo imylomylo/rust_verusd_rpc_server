@@ -4,6 +4,8 @@ use jsonrpc::{Client, error::RpcError};
 use jsonrpc::simple_http::{self, SimpleHttpTransport};
 use serde_json::value::RawValue;
 use std::sync::{Arc, Mutex};
+use dotenv::dotenv;
+use std::env;
 
 mod allowlist;
 
@@ -119,7 +121,36 @@ async fn handle_req(req: Request<Body>, rpc: Arc<VerusRPC>) -> Result<Response<B
 }
 
 #[tokio::main]
-async fn main() {
+async fn main(){
+    dotenv().ok();
+    let server_addr = "0.0.0.0";
+    let url = env::var("RPC_URL").expect("RPC_URL not set");
+    let user = env::var("RPC_USER").expect("RPC_USER not set");
+    let password = env::var("RPC_PASS").expect("RPC_PASS not set");
+    let port: u16 = env::var("LISTEN_PORT")
+        .expect("LISTEN_PORT not set")
+        .parse()
+        .expect("LISTEN_PORT is not a valid number");
+
+
+    let addr = (server_addr.parse::<std::net::IpAddr>().unwrap(), port).into();
+
+    let make_svc = make_service_fn(|_conn| {
+        let rpc = Arc::new(VerusRPC::new(&url, &user, &password).unwrap());
+        async {
+            Ok::<_, hyper::Error>(service_fn(move |req| handle_req(req, rpc.clone())))
+        }
+    });
+
+    let server = Server::bind(&addr).serve(make_svc);
+
+    if let Err(e) = server.await {
+        eprintln!("server error: {}", e);
+    }
+
+}
+
+async fn orig_main() {
     let mut settings = config::Config::default();
     
     settings.merge(config::File::with_name("Conf")).expect("Failed to open configuration file");

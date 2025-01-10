@@ -17,7 +17,7 @@ WORKDIR /usr/src/app
 
 # Copy the compiled binary and configuration file from the builder stage
 COPY --from=builder /usr/src/app/target/release/rust_verusd_rpc_server ./
-COPY --from=builder /usr/src/app/Conf.toml ./
+#COPY --from=builder /usr/src/app/Conf.toml ./
 
 # Set the command to run the binary
 CMD ["./rust_verusd_rpc_server"]
