@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   rust_verusd_rpc_server:
-    build: .
+    image: verustrading/rust_rpc_server:0.1
     ports:
       - "${LISTEN_PORT}:${LISTEN_PORT}"
     networks:
