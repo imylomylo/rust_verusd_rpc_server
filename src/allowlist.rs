@@ -23,14 +23,20 @@ fn check_params(params: &[Box<RawValue>], expected_types: &[&str]) -> bool {
 pub fn is_method_allowed(method: &str, params: &[Box<RawValue>]) -> bool {
     match method {
         "fundrawtransaction" => {
-            if params.len() != 4 {
-                return false;
-            }
-            match (serde_json::from_str::<Value>(&params[0].to_string()),
-                   serde_json::from_str::<Value>(&params[1].to_string()),
-                   serde_json::from_str::<Value>(&params[2].to_string()),
-                   serde_json::from_str::<Value>(&params[3].to_string())) {
-                (Ok(Value::String(_)), Ok(Value::Array(_)), Ok(Value::String(_)), Ok(Value::Number(_))) => true,
+            match params.len() {
+                4 => match (serde_json::from_str::<Value>(&params[0].to_string()),
+                            serde_json::from_str::<Value>(&params[1].to_string()),
+                            serde_json::from_str::<Value>(&params[2].to_string()),
+                            serde_json::from_str::<Value>(&params[3].to_string())) {
+                    (Ok(Value::String(_)), Ok(Value::Array(_)), Ok(Value::String(_)), Ok(Value::Number(_))) => true,
+                    _ => false,
+                },
+                3 => match (serde_json::from_str::<Value>(&params[0].to_string()),
+                            serde_json::from_str::<Value>(&params[1].to_string()),
+                            serde_json::from_str::<Value>(&params[2].to_string())) {
+                    (Ok(Value::String(_)), Ok(Value::Array(_)), Ok(Value::String(_))) => true,
+                    _ => false,
+                },
                 _ => false,
             }
         },
@@ -93,6 +99,7 @@ pub fn is_method_allowed(method: &str, params: &[Box<RawValue>]) -> bool {
         "getidentity" => check_params(params, &["str", "int", "bool", "int"]),
         "getidentitytrust" => check_params(params, &["arr"]),
         "getidentitycontent" => check_params(params, &["str", "int", "int", "bool", "int", "str", "bool"]),
+        "getidentityhistory" => check_params(params, &["str", "int", "int", "bool", "int"]),
         "getlastimportfrom" => check_params(params, &["str"]),
         "getimports" => check_params(params, &["str","int","int"]),
         "getlaunchinfo" => check_params(params, &["str"]),
