@@ -66,6 +66,7 @@ pub fn is_method_allowed(method: &str, params: &[Box<RawValue>]) -> bool {
         "createrawtransaction" => check_params(params, &["arr", "obj", "int", "int"]),
         "decoderawtransaction" => check_params(params, &["str", "bool"]),
         "decodescript" => check_params(params, &["str", "bool"]),
+        "decryptdata" => check_params(params, &["obj"]),
         "estimateconversion" => check_params(params, &["obj"]),
         "estimatefee" => check_params(params, &["int"]),
         "estimatepriority" => check_params(params, &["int"]),
